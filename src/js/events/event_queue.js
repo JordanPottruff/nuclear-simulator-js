@@ -39,9 +39,6 @@ class EventQueue {
 
     nextEvent.executionFn(this.timeMillis);
     let executionDelayTime = Date.now() - executionStartTime;
-    if (executionDelayTime > 0) {
-      console.log(executionDelayTime);
-    }
     setTimeout(() => {
       this.doNextRecursively();
     }, deltaTime - executionDelayTime + Math.random() * 5);
@@ -56,9 +53,6 @@ class EventQueue {
 
     let subsequentEvent = this.getNextEvent();
     let executionDelayTime = Date.now() - executionStartTime;
-    console.log(
-      subsequentEvent.timeMillis - this.timeMillis - executionDelayTime
-    );
     setTimeout(() => {
       this.doNextRecursively2(subsequentEvent);
     }, Math.max(subsequentEvent.timeMillis - this.timeMillis - executionDelayTime, 0));
