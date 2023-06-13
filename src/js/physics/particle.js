@@ -16,6 +16,18 @@ class Particle {
     return new Particle(x, y, vx, vy, this.radius, this.color, this.mass);
   }
 
+  withMove(deltaTime) {
+    return new Particle(
+      this.x + this.vx * deltaTime,
+      this.y + this.vy * deltaTime,
+      this.vx,
+      this.vy,
+      this.radius,
+      this.color,
+      this.mass
+    );
+  }
+
   draw() {
     fill(this.color);
     noStroke();

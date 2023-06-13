@@ -36,7 +36,7 @@ class EventRegistry {
       executionFn,
     });
     this.interactionEvents.push({
-      timingFn: (a, b) => timingFn(b, a),
+      timingFn: (a, b, state) => timingFn(b, a, state),
       executionFn: (a, b, state) => executionFn(b, a, state),
     });
   }

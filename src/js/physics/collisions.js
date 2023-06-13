@@ -1,14 +1,28 @@
 /** Returns the time in seconds until a collision between the given particles,
  * or null if no collision will occur. */
-function getParticleCollisionTime(particleA, particleB) {
-  if (particleA === particleB) {
+function getParticleCollisionTime(
+  particleEntityA,
+  particleEntityB,
+  currentTimeMillis
+) {
+  if (particleEntityA === particleEntityB) {
     return null;
   }
 
+  let particleADeltaSeconds =
+    (currentTimeMillis - particleEntityA.createdTimeMillis) / 1000;
+  let particleA = particleEntityA.entity.withMove(particleADeltaSeconds);
+
+  let particleBDeltaSeconds =
+    (currentTimeMillis - particleEntityB.createdTimeMillis) / 1000;
+  let particleB = particleEntityB.entity.withMove(particleBDeltaSeconds);
+
   const dx = particleA.x - particleB.x;
   const dy = particleA.y - particleB.y;
-
-  if (Math.sqrt(dx * dx + dy * dy) < 0.001) {
+  if (
+    Math.sqrt(dx * dx + dy * dy) <=
+    particleA.radius + particleB.radius + 0.001
+  ) {
     return null;
   }
   const dvx = particleA.vx - particleB.vx;
@@ -44,8 +58,20 @@ function resolveParticleCollision(
 ) {
   const particleA = particleEntityA.entity;
   const particleB = particleEntityB.entity;
-  const dx = particleA.x - particleB.x;
-  const dy = particleA.y - particleB.y;
+
+  const deltaTimeSecondsA =
+    (collisionTimeMillis - particleEntityA.createdTimeMillis) / 1000;
+  const deltaTimeSecondsB =
+    (collisionTimeMillis - particleEntityB.createdTimeMillis) / 1000;
+
+  const aX = particleA.x + particleA.vx * deltaTimeSecondsA;
+  const aY = particleA.y + particleA.vy * deltaTimeSecondsA;
+
+  const bX = particleB.x + particleB.vx * deltaTimeSecondsB;
+  const bY = particleB.y + particleB.vy * deltaTimeSecondsB;
+
+  const dx = aX - bX;
+  const dy = aY - bY;
   const dvx = particleA.vx - particleB.vx;
   const dvy = particleA.vy - particleB.vy;
   const dvdr = dx * dvx + dy * dvy;
@@ -58,34 +84,31 @@ function resolveParticleCollision(
   const fx = (magnitude * dx) / dist;
   const fy = (magnitude * dy) / dist;
 
-  const deltaTimeSecondsA =
-    (collisionTimeMillis - particleEntityA.createdTimeMillis) / 1000;
-  const deltaTimeSecondsB =
-    (collisionTimeMillis - particleEntityB.createdTimeMillis) / 1000;
-
-  return [
+  let newState = [
     particleA.withNewState(
-      particleA.x + particleA.vx * deltaTimeSecondsA,
-      particleA.y + particleA.vy * deltaTimeSecondsA,
-      fx / particleB.mass,
-      fy / particleB.mass
+      aX,
+      aY,
+      particleA.vx - fx / particleA.mass,
+      particleA.vy - fy / particleA.mass
     ),
     particleB.withNewState(
-      particleB.x + particleB.vx * deltaTimeSecondsB,
-      particleB.y + particleB.vy * deltaTimeSecondsB,
-      fx / particleA.mass,
-      fy / particleA.mass
+      bX,
+      bY,
+      particleB.vx + fx / particleB.mass,
+      particleB.vy + fy / particleB.mass
     ),
   ];
+  return newState;
 }
 
 /** Adds an interaction event for particles colliding with one another. */
 function addParticleCollisionEvent(registry) {
   registry.addInteractionEvent(
-    (particleEntityA, particleEntityB) => {
+    (particleEntityA, particleEntityB, state) => {
       let secondsToEvent = getParticleCollisionTime(
-        particleEntityA.entity,
-        particleEntityB.entity
+        particleEntityA,
+        particleEntityB,
+        state.timeMillis
       );
       return secondsToEvent === null ? null : secondsToEvent * 1000;
     },

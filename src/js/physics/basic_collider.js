@@ -12,10 +12,17 @@ class BasicCollider {
     return registry;
   }
 
+  getParticlesBasic() {
+    return [
+      new Particle(500, 100, 0, 50, 20, color(255, 0, 0), 10),
+      new Particle(500, 900, 0, -50, 20, color(0, 255, 0), 10),
+    ];
+  }
+
   getParticles() {
     let particles = [];
-    let numAcross = 4;
-    let numDown = 4;
+    let numAcross = 10;
+    let numDown = 10;
 
     for (let i = 0; i < numAcross; i++) {
       for (let j = 0; j < numDown; j++) {

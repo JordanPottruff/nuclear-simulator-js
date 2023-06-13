@@ -74,10 +74,17 @@ class Simulation {
       return;
     }
 
-    let delayMillis = interactionEvent.timingFn(entityA, entityB);
+    console.log(this.getState());
+    let delayMillis = interactionEvent.timingFn(
+      entityA,
+      entityB,
+      this.getState()
+    );
     if (delayMillis === null) {
       return;
     }
+
+    console.log("add interaction");
 
     this.eventQueue.addEvent(
       delayMillis,
