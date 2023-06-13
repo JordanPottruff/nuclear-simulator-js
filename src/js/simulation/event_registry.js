@@ -2,6 +2,7 @@ class EventRegistry {
   constructor() {
     this.creationEvents = new Array();
     this.interactionEvents = new Array();
+    this.intervalEvents = new Array();
   }
 
   /**
@@ -37,6 +38,13 @@ class EventRegistry {
     this.interactionEvents.push({
       timingFn: (a, b) => timingFn(b, a),
       executionFn: (a, b, state) => executionFn(b, a, state),
+    });
+  }
+
+  addIntervalEvent(intervalMillis, executionFn) {
+    this.intervalEvents.push({
+      intervalMillis,
+      executionFn,
     });
   }
 }

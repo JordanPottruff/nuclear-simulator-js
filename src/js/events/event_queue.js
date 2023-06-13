@@ -17,10 +17,11 @@ class EventQueue {
 
   start() {
     this.running = true;
-    this.doNextRecursively();
+    this.doNextRecursively2(this.getNextEvent());
   }
 
   doNextRecursively() {
+    let executionStartTime = Date.now();
     if (!this.running) {
       return;
     }
@@ -33,11 +34,45 @@ class EventQueue {
       nextEvent = this.events.delMin();
     } while (!nextEvent.validationFn());
 
+    let deltaTime = nextEvent.timeMillis - this.timeMillis;
+    this.timeMillis = nextEvent.timeMillis;
+
+    nextEvent.executionFn(this.timeMillis);
+    let executionDelayTime = Date.now() - executionStartTime;
+    if (executionDelayTime > 0) {
+      console.log(executionDelayTime);
+    }
     setTimeout(() => {
-      this.timeMillis = nextEvent.timeMillis;
-      nextEvent.executionFn(this.timeMillis);
       this.doNextRecursively();
-    }, nextEvent.timeMillis - this.timeMillis);
+    }, deltaTime - executionDelayTime + Math.random() * 5);
+  }
+
+  doNextRecursively2(nextEvent) {
+    let executionStartTime = Date.now();
+
+    this.timeMillis = nextEvent.timeMillis;
+
+    nextEvent.executionFn(this.timeMillis);
+
+    let subsequentEvent = this.getNextEvent();
+    let executionDelayTime = Date.now() - executionStartTime;
+    console.log(
+      subsequentEvent.timeMillis - this.timeMillis - executionDelayTime
+    );
+    setTimeout(() => {
+      this.doNextRecursively2(subsequentEvent);
+    }, Math.max(subsequentEvent.timeMillis - this.timeMillis - executionDelayTime, 0));
+  }
+
+  getNextEvent() {
+    let nextEvent;
+    do {
+      if (this.events.isEmpty()) {
+        return;
+      }
+      nextEvent = this.events.delMin();
+    } while (!nextEvent.validationFn());
+    return nextEvent;
   }
 
   stop() {

@@ -18,6 +18,7 @@ class Simulation {
   init() {
     this.spawnCreationEvents(this.entities);
     this.spawnInteractionEvents(this.entities);
+    this.spawnIntervalEvents();
   }
 
   spawnCreationEvents(entitiesChanged) {
@@ -92,6 +93,27 @@ class Simulation {
       () => {
         return this.entities.has(entityA) && this.entities.has(entityB);
       }
+    );
+  }
+
+  spawnIntervalEvents() {
+    this.eventRegistry.intervalEvents.forEach((event) =>
+      this.spawnIntervalEvent(event)
+    );
+  }
+
+  spawnIntervalEvent(intervalEvent) {
+    this.eventQueue.addEvent(
+      intervalEvent.intervalMillis,
+      (timeMillis) => {
+        this.timeMillis = timeMillis;
+        let possibleChange = intervalEvent.executionFn(this.getState());
+        if (possibleChange) {
+          this.processStateChange(change, timeMillis);
+        }
+        this.spawnIntervalEvent(intervalEvent);
+      },
+      () => true
     );
   }
 
