@@ -55,18 +55,21 @@ class Simulation {
 
   spawnInteractionEventsForEntity(interactionEvent, entitiesChanged) {
     let alreadyProcessed = new Set();
+    let numProcessed = 0;
     entitiesChanged.forEach((changedEntity) => {
       [...this.entities]
         .filter((otherEntity) => !alreadyProcessed.has(otherEntity))
-        .forEach((otherEntity) =>
+        .forEach((otherEntity) => {
           this.spawnInteractionEventForEntityPair(
             interactionEvent,
             changedEntity,
             otherEntity
-          )
-        );
+          );
+          numProcessed++;
+        });
       alreadyProcessed.add(changedEntity);
     });
+    console.log(numProcessed);
   }
 
   spawnInteractionEventForEntityPair(interactionEvent, entityA, entityB) {
@@ -74,7 +77,6 @@ class Simulation {
       return;
     }
 
-    console.log(this.getState());
     let delayMillis = interactionEvent.timingFn(
       entityA,
       entityB,
@@ -83,8 +85,6 @@ class Simulation {
     if (delayMillis === null) {
       return;
     }
-
-    console.log("add interaction");
 
     this.eventQueue.addEvent(
       delayMillis,
@@ -110,7 +110,7 @@ class Simulation {
   }
 
   spawnIntervalEvent(intervalEvent) {
-    this.eventQueue.addEvent(
+    this.eventQueue.addRealTimeEvent(
       intervalEvent.intervalMillis,
       (timeMillis) => {
         this.timeMillis = timeMillis;

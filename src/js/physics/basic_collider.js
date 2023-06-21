@@ -2,7 +2,7 @@ class BasicCollider {
   screenWidth = 1000;
   screenHeight = 1000;
 
-  maxParticleVelocity = 100;
+  maxParticleVelocity = 50;
 
   getRegistry() {
     let registry = new EventRegistry();
@@ -22,7 +22,7 @@ class BasicCollider {
   getParticles() {
     let particles = [];
     let numAcross = 10;
-    let numDown = 10;
+    let numDown = 20;
 
     for (let i = 0; i < numAcross; i++) {
       for (let j = 0; j < numDown; j++) {
@@ -56,7 +56,7 @@ class BasicCollider {
             particleVy,
             particleRadius,
             particleColor,
-            10
+            particleRadius
           )
         );
       }

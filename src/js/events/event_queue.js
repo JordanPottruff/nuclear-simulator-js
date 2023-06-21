@@ -3,6 +3,7 @@ class EventQueue {
     this.events = new PriorityQueue((a, b) => a.compareTo(b));
     this.running = false;
     this.timeMillis = 0;
+    this.realTimeMillis = 0;
   }
 
   addEvent(delayMillis, executionFn, validationFn) {
@@ -10,52 +11,44 @@ class EventQueue {
       new ScheduledEvent(
         delayMillis + this.timeMillis,
         executionFn,
-        validationFn
+        validationFn,
+        false
+      )
+    );
+  }
+
+  addRealTimeEvent(delayMillis, executionFn, validationFn) {
+    this.events.insert(
+      new ScheduledEvent(
+        delayMillis + this.timeMillis,
+        executionFn,
+        validationFn,
+        true
       )
     );
   }
 
   start() {
     this.running = true;
-    this.doNextRecursively2(this.getNextEvent());
+    this.doNextRecursively(0);
   }
 
-  doNextRecursively() {
-    let executionStartTime = Date.now();
-    if (!this.running) {
-      return;
+  doNextRecursively(realTimeDelay) {
+    let startTime = Date.now();
+    let nextEvent = this.getNextEvent();
+    this.timeMillis = nextEvent.timeMillis;
+
+    if (nextEvent.isRealTime) {
+      let realTimeDelayMillis = nextEvent.timeMillis - this.realTimeMillis;
+      this.realTimeMillis = nextEvent.timeMillis;
+      setTimeout(() => {
+        nextEvent.executionFn(nextEvent.timeMillis);
+        this.doNextRecursively(0);
+      }, realTimeDelayMillis - realTimeDelay);
+    } else {
+      nextEvent.executionFn(nextEvent.timeMillis);
+      this.doNextRecursively(realTimeDelay + Date.now() - startTime);
     }
-
-    let nextEvent;
-    do {
-      if (this.events.isEmpty()) {
-        return;
-      }
-      nextEvent = this.events.delMin();
-    } while (!nextEvent.validationFn());
-
-    let deltaTime = nextEvent.timeMillis - this.timeMillis;
-    this.timeMillis = nextEvent.timeMillis;
-
-    nextEvent.executionFn(this.timeMillis);
-    let executionDelayTime = Date.now() - executionStartTime;
-    setTimeout(() => {
-      this.doNextRecursively();
-    }, deltaTime - executionDelayTime + Math.random() * 5);
-  }
-
-  doNextRecursively2(nextEvent) {
-    let executionStartTime = Date.now();
-
-    this.timeMillis = nextEvent.timeMillis;
-
-    nextEvent.executionFn(this.timeMillis);
-
-    let subsequentEvent = this.getNextEvent();
-    let executionDelayTime = Date.now() - executionStartTime;
-    setTimeout(() => {
-      this.doNextRecursively2(subsequentEvent);
-    }, Math.max(subsequentEvent.timeMillis - this.timeMillis - executionDelayTime, 0));
   }
 
   getNextEvent() {
@@ -75,10 +68,11 @@ class EventQueue {
 }
 
 class ScheduledEvent {
-  constructor(timeMillis, executionFn, validationFn) {
+  constructor(timeMillis, executionFn, validationFn, isRealTime) {
     this.timeMillis = timeMillis;
     this.executionFn = executionFn;
     this.validationFn = validationFn;
+    this.isRealTime = isRealTime;
   }
 
   compareTo(otherEvent) {
