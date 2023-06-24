@@ -54,22 +54,20 @@ class Simulation {
   }
 
   spawnInteractionEventsForEntity(interactionEvent, entitiesChanged) {
-    let alreadyProcessed = new Set();
-    let numProcessed = 0;
-    entitiesChanged.forEach((changedEntity) => {
-      [...this.entities]
-        .filter((otherEntity) => !alreadyProcessed.has(otherEntity))
-        .forEach((otherEntity) => {
-          this.spawnInteractionEventForEntityPair(
-            interactionEvent,
-            changedEntity,
-            otherEntity
-          );
-          numProcessed++;
-        });
-      alreadyProcessed.add(changedEntity);
-    });
-    console.log(numProcessed);
+    let delay = 0;
+    let entitiesChangedList = Array.from(entitiesChanged);
+    let entitiesList = Array.from(this.entities);
+    for (let i = 0; i < entitiesChangedList.length; i++) {
+      let changedEntity = entitiesList[i];
+      for (let j = 0; j < entitiesList.length; j++) {
+        let otherEntity = entitiesList[j];
+        delay += this.spawnInteractionEventForEntityPair(
+          interactionEvent,
+          changedEntity,
+          otherEntity
+        );
+      }
+    }
   }
 
   spawnInteractionEventForEntityPair(interactionEvent, entityA, entityB) {
@@ -126,7 +124,7 @@ class Simulation {
 
   getState() {
     return {
-      entities: new Set(this.entities),
+      entities: this.entities,
       timeMillis: this.timeMillis,
     };
   }

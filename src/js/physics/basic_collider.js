@@ -3,6 +3,7 @@ class BasicCollider {
   screenHeight = 1000;
 
   maxParticleVelocity = 50;
+  paddingPercentage = 0.2;
 
   getRegistry() {
     let registry = new EventRegistry();
@@ -21,8 +22,8 @@ class BasicCollider {
 
   getParticles() {
     let particles = [];
-    let numAcross = 10;
-    let numDown = 20;
+    let numAcross = 100;
+    let numDown = 50;
 
     for (let i = 0; i < numAcross; i++) {
       for (let j = 0; j < numDown; j++) {
@@ -32,7 +33,9 @@ class BasicCollider {
         let sectorY = j * sectorHeight;
 
         let particleRadius =
-          (Math.min(sectorWidth, sectorHeight) * Math.random()) / 2;
+          ((1 - this.paddingPercentage) *
+            (Math.min(sectorWidth, sectorHeight) * Math.random())) /
+          2;
         let particleX =
           sectorX +
           particleRadius +

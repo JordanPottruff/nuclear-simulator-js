@@ -11,14 +11,20 @@ function getParticleCollisionTime(
 
   let particleADeltaSeconds =
     (currentTimeMillis - particleEntityA.createdTimeMillis) / 1000;
-  let particleA = particleEntityA.entity.withMove(particleADeltaSeconds);
+  let particleA = particleEntityA.entity;
 
   let particleBDeltaSeconds =
     (currentTimeMillis - particleEntityB.createdTimeMillis) / 1000;
-  let particleB = particleEntityB.entity.withMove(particleBDeltaSeconds);
+  let particleB = particleEntityB.entity;
 
-  const dx = particleA.x - particleB.x;
-  const dy = particleA.y - particleB.y;
+  const dx =
+    particleA.x +
+    particleA.vx * particleADeltaSeconds -
+    (particleB.x + particleB.vx * particleBDeltaSeconds);
+  const dy =
+    particleA.y +
+    particleA.vy * particleADeltaSeconds -
+    (particleB.y + particleB.vy * particleBDeltaSeconds);
   if (
     Math.sqrt(dx * dx + dy * dy) <=
     particleA.radius + particleB.radius + 0.001

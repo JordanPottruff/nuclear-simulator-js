@@ -34,7 +34,7 @@ class EventQueue {
   }
 
   doNextRecursively(realTimeDelay) {
-    let startTime = Date.now();
+    let startTime = window.performance.now();
     let nextEvent = this.getNextEvent();
     this.timeMillis = nextEvent.timeMillis;
 
@@ -47,7 +47,9 @@ class EventQueue {
       }, realTimeDelayMillis - realTimeDelay);
     } else {
       nextEvent.executionFn(nextEvent.timeMillis);
-      this.doNextRecursively(realTimeDelay + Date.now() - startTime);
+      this.doNextRecursively(
+        realTimeDelay + Math.max(window.performance.now() - startTime, 0)
+      );
     }
   }
 
