@@ -1,5 +1,5 @@
 function setup() {
-  let collider = new BasicCollider();
+  let collider = new NuclearCollider();
 
   createCanvas(collider.screenWidth, collider.screenHeight);
   noLoop();

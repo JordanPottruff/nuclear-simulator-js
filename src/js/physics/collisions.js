@@ -25,10 +25,9 @@ function getParticleCollisionTime(
     particleA.y +
     particleA.vy * particleADeltaSeconds -
     (particleB.y + particleB.vy * particleBDeltaSeconds);
-  if (
-    Math.sqrt(dx * dx + dy * dy) <=
-    particleA.radius + particleB.radius + 0.001
-  ) {
+
+  const dist = particleA.radius + particleB.radius + 0.001;
+  if (dx * dx + dy * dy <= dist * dist) {
     return null;
   }
   const dvx = particleA.vx - particleB.vx;
@@ -50,8 +49,25 @@ function getParticleCollisionTime(
     return null;
   }
 
-  const answer = -(dvdr + Math.sqrt(d)) / dvdv;
-  return Math.abs(answer);
+  return -(dvdr + Math.sqrt(d)) / dvdv;
+}
+
+function getParticleCollisionTimingFn(typeA = "generic", typeB = "generic") {
+  return (particleEntityA, particleEntityB, state) => {
+    if (
+      particleEntityA.entity.type != typeA ||
+      particleEntityB.entity.type != typeB
+    ) {
+      return null;
+    }
+    let secondsToEvent = getParticleCollisionTime(
+      particleEntityA,
+      particleEntityB,
+      state.timeMillis
+    );
+    console.log(secondsToEvent);
+    return secondsToEvent === null ? null : secondsToEvent * 1000;
+  };
 }
 
 /** Returns two particles representing the resulting state of the two given
@@ -107,28 +123,25 @@ function resolveParticleCollision(
   return newState;
 }
 
+function getParticleCollisionExecutionFn() {
+  return (particleEntityA, particleEntityB, state) => {
+    let stateChange = new StateChange();
+    stateChange.addRemovedEntity(particleEntityA);
+    stateChange.addRemovedEntity(particleEntityB);
+    resolveParticleCollision(
+      particleEntityA,
+      particleEntityB,
+      state.timeMillis
+    ).forEach((particle) => stateChange.addAddedEntity(particle));
+    return stateChange;
+  };
+}
+
 /** Adds an interaction event for particles colliding with one another. */
 function addParticleCollisionEvent(registry) {
   registry.addInteractionEvent(
-    (particleEntityA, particleEntityB, state) => {
-      let secondsToEvent = getParticleCollisionTime(
-        particleEntityA,
-        particleEntityB,
-        state.timeMillis
-      );
-      return secondsToEvent === null ? null : secondsToEvent * 1000;
-    },
-    (particleEntityA, particleEntityB, state) => {
-      let stateChange = new StateChange();
-      stateChange.addRemovedEntity(particleEntityA);
-      stateChange.addRemovedEntity(particleEntityB);
-      resolveParticleCollision(
-        particleEntityA,
-        particleEntityB,
-        state.timeMillis
-      ).forEach((particle) => stateChange.addAddedEntity(particle));
-      return stateChange;
-    }
+    getParticleCollisionTimingFn(),
+    getParticleCollisionExecutionFn()
   );
 }
 

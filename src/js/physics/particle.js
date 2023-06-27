@@ -1,5 +1,5 @@
 class Particle {
-  constructor(x, y, vx, vy, radius, color, mass = 0) {
+  constructor(x, y, vx, vy, radius, color, mass = 0, type = "generic") {
     this.x = x;
     this.y = y;
     this.vx = vx;
@@ -7,13 +7,23 @@ class Particle {
     this.radius = radius;
     this.color = color;
     this.mass = mass;
+    this.type = type;
   }
 
   /**
    * Creates a new particle from the current one by modifying the velocity only.
    */
   withNewState(x, y, vx, vy) {
-    return new Particle(x, y, vx, vy, this.radius, this.color, this.mass);
+    return new Particle(
+      x,
+      y,
+      vx,
+      vy,
+      this.radius,
+      this.color,
+      this.mass,
+      this.type
+    );
   }
 
   withMove(deltaTime) {
@@ -24,7 +34,8 @@ class Particle {
       this.vy,
       this.radius,
       this.color,
-      this.mass
+      this.mass,
+      this.type
     );
   }
 
