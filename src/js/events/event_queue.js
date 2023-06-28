@@ -1,4 +1,5 @@
 import { ScheduledEvent } from "./scheduled_event.js";
+import { PriorityQueue } from "./priority_queue.js";
 
 /**
  * A queue that processes a sequence of incoming events, optionally in real
@@ -24,7 +25,7 @@ export class EventQueue {
    * @param {ScheduledEvent} scheduledEvent - the event to add onto the queue.
    */
   addEvent(scheduledEvent) {
-    this.events.insert({
+    this.#events.insert({
       ...scheduledEvent,
       // For prioritization, we need to put events in terms of absolute time.
       absoluteTimeMillis: scheduledEvent.timeDelayMillis + this.#timeMillis,
@@ -39,12 +40,16 @@ export class EventQueue {
       return;
     }
     this.#running = true;
+    this.#run();
   }
 
   #run() {
     let lastRealTime = this.#getTime();
     while (this.#running) {
       let nextEvent = this.#getNextValidEvent();
+      if (nextEvent === null) {
+        return;
+      }
       let eventTime = nextEvent.absoluteTimeMillis;
       this.#timeMillis = eventTime;
 
@@ -68,15 +73,14 @@ export class EventQueue {
 
   /**
    *
-   * @returns {ScheduledEvent} - the next valid event in the queue.
    */
   #getNextValidEvent() {
     let nextEvent;
     do {
-      if (this.events.isEmpty()) {
+      if (this.#events.isEmpty()) {
         return null;
       }
-      nextEvent = this.events.delMin();
+      nextEvent = this.#events.delMin();
     } while (!nextEvent.validationFn());
     return nextEvent;
   }
