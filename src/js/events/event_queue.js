@@ -67,13 +67,13 @@ export class EventQueue {
     }
   }
 
+  /**
+   * Stops the simulation.
+   */
   stop() {
     this.#running = false;
   }
 
-  /**
-   *
-   */
   #getNextValidEvent() {
     let nextEvent;
     do {
