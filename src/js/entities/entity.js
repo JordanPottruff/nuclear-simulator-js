@@ -4,6 +4,8 @@
  * Entities are wrappers of some custom underlying value. The primary purpose of
  * having this wrapper is to store additonal, simulation-related data about the
  * entity/value.
+ * @template T
+ * @property {T} value - the underlying value.
  */
 export class Entity {
   #value;
@@ -14,7 +16,9 @@ export class Entity {
     this.#createdTimeMillis = createdTimeMillis;
   }
 
-  /** Returns the value underlying this entity. */
+  /** Returns the value underlying this entity.
+   * @returns {T} the underlying value.
+   */
   getValue() {
     return this.#value;
   }

@@ -79,7 +79,7 @@ export class EntitySimulation {
         intervalEvent.intervalMillis,
         () => true,
         (timeMillis) => {
-          this.timeMillis = timeMillis;
+          this.#timeMillis = timeMillis;
           this.#commitSimChange(intervalEvent.executionFn(this.#getSimState()));
           this.#spawnIntervalEvent(intervalEvent);
         },
