@@ -57,9 +57,13 @@ export class EventQueue {
         let realTimeDelayMillis = eventTime - this.#realTimeMillis;
         this.#realTimeMillis = eventTime;
         setTimeout(() => {
+          console.log(
+            this.#events.size(),
+            realTimeDelayMillis - (this.#getTime() - lastRealTime)
+          );
           nextEvent.executionFn(eventTime);
           this.#run();
-        }, realTimeDelayMillis - (this.#getTime() - lastRealTime));
+        }, Math.max(realTimeDelayMillis - (this.#getTime() - lastRealTime), 0));
         break;
       } else {
         nextEvent.executionFn(eventTime);

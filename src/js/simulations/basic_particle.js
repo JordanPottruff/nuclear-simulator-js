@@ -9,13 +9,22 @@ import { Particle } from "../particles/particle.js";
 export class BasicParticleSimulation {
   #screenWidth;
   #screenHeight;
+  #numParticlesAcross;
+  #maxVelocity;
+  #paddingPercentage;
 
-  maxParticleVelocity = 50;
-  paddingPercentage = 0.2;
-
-  constructor(screenWidth, screenHeight) {
+  constructor(
+    screenWidth,
+    screenHeight,
+    numParticlesAcross,
+    maxVelocity,
+    paddingPercentage = 0.25
+  ) {
     this.#screenWidth = screenWidth;
     this.#screenHeight = screenHeight;
+    this.#numParticlesAcross = numParticlesAcross;
+    this.#maxVelocity = maxVelocity;
+    this.#paddingPercentage = paddingPercentage;
   }
 
   getRegistry() {
@@ -47,18 +56,16 @@ export class BasicParticleSimulation {
 
   getParticles() {
     let particles = [];
-    let numAcross = 20;
-    let numDown = 20;
 
-    for (let i = 0; i < numAcross; i++) {
-      for (let j = 0; j < numDown; j++) {
-        let sectorWidth = this.#screenWidth / numAcross;
-        let sectorHeight = this.#screenHeight / numDown;
+    for (let i = 0; i < this.#numParticlesAcross; i++) {
+      for (let j = 0; j < this.#numParticlesAcross; j++) {
+        let sectorWidth = this.#screenWidth / this.#numParticlesAcross;
+        let sectorHeight = this.#screenHeight / this.#numParticlesAcross;
         let sectorX = i * sectorWidth;
         let sectorY = j * sectorHeight;
 
         let particleRadius =
-          ((1 - this.paddingPercentage) *
+          ((1 - this.#paddingPercentage) *
             (Math.min(sectorWidth, sectorHeight) * Math.random())) /
           2;
         let particleX =
@@ -69,8 +76,8 @@ export class BasicParticleSimulation {
           sectorY +
           particleRadius +
           Math.random() * (sectorHeight - particleRadius * 2);
-        let particleVx = this.maxParticleVelocity * (Math.random() * 2 - 1);
-        let particleVy = this.maxParticleVelocity * (Math.random() * 2 - 1);
+        let particleVx = this.#maxVelocity * (Math.random() * 2 - 1);
+        let particleVy = this.#maxVelocity * (Math.random() * 2 - 1);
         let particleColor = {
           red: Math.random(),
           green: Math.random(),

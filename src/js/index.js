@@ -6,7 +6,10 @@ function setup() {
   let screenHeight = 1000;
   let particleSimulation = new BasicParticleSimulation(
     screenWidth,
-    screenHeight
+    screenHeight,
+    50,
+    50,
+    0.2
   );
 
   createCanvas(screenWidth, screenHeight);
