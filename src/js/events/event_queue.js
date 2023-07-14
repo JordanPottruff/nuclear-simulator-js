@@ -1,4 +1,5 @@
 import { ScheduledEvent } from "./scheduled_event.js";
+import { PairingHeap } from "./pairing_heap.js";
 import { PriorityQueue } from "./priority_queue.js";
 
 /**
@@ -56,11 +57,8 @@ export class EventQueue {
       if (nextEvent.isRealTime) {
         let realTimeDelayMillis = eventTime - this.#realTimeMillis;
         this.#realTimeMillis = eventTime;
+        console.log(this.#getTime() - lastRealTime);
         setTimeout(() => {
-          console.log(
-            this.#events.size(),
-            realTimeDelayMillis - (this.#getTime() - lastRealTime)
-          );
           nextEvent.executionFn(eventTime);
           this.#run();
         }, Math.max(realTimeDelayMillis - (this.#getTime() - lastRealTime), 0));
