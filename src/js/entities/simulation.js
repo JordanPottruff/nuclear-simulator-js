@@ -56,8 +56,16 @@ export class EntitySimulation {
   start() {
     if (!this.#started) {
       this.#init();
-      this.started = true;
+      this.#started = true;
       this.#eventQueue.start();
+    }
+  }
+
+  /** Stops the simulation, if already started. */
+  stop() {
+    if (this.#started) {
+      this.#started = false;
+      this.#eventQueue.stop();
     }
   }
 

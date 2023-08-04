@@ -18,6 +18,7 @@ export class Particle {
   #radius;
   #mass;
   #color;
+  #type;
 
   /**
    * Creates a new particle.
@@ -29,7 +30,7 @@ export class Particle {
    * @param {number} mass the mass of the particle.
    * @param {Color} color the color of the particle.
    */
-  constructor(x, y, vx, vy, radius, mass, color) {
+  constructor(x, y, vx, vy, radius, mass, color, type = "particle") {
     this.#x = x;
     this.#y = y;
     this.#vx = vx;
@@ -37,6 +38,7 @@ export class Particle {
     this.#radius = radius;
     this.#mass = mass;
     this.#color = color;
+    this.#type = type;
   }
 
   /**
@@ -98,6 +100,14 @@ export class Particle {
   }
 
   /**
+   * Returns the type of the particle.
+   * @returns {string} the type of the particle.
+   */
+  getType() {
+    return this.#type;
+  }
+
+  /**
    * Creates a new particle that is the result of moving the current particle
    * along the current velocity for the given amount of time.
    * @param {number} deltaTimeMillis the time in milliseconds to move the
@@ -113,7 +123,8 @@ export class Particle {
       this.#vy,
       this.#radius,
       this.#mass,
-      this.#color
+      this.#color,
+      this.#type
     );
   }
 
@@ -125,14 +136,28 @@ export class Particle {
    * @returns {Particle} the new particle.
    */
   withVelocity(vx, vy) {
+    return this.withPositionAndVelocity(this.#x, this.#y, vx, vy);
+  }
+
+  /**
+   * Creates a new particle that is the result of changing the position and
+   * velocity of the current particle.
+   * @param {number} x the new x-position.
+   * @param {number} y the new y-position.
+   * @param {number} vx the new x-velocity.
+   * @param {number} vy the new y-velocity.
+   * @returns {Partice} the new particle.
+   */
+  withPositionAndVelocity(x, y, vx, vy) {
     return new Particle(
-      this.#x,
-      this.#y,
+      x,
+      y,
       vx,
       vy,
       this.#radius,
       this.#mass,
-      this.#color
+      this.#color,
+      this.#type
     );
   }
 }

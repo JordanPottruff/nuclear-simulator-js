@@ -1,44 +1,19 @@
-import { BasicParticleSimulation } from "./simulations/basic_particle.js";
 import { EntitySimulation } from "./entities/simulation.js";
+import { CriticalitySimulation } from "./simulations/criticality.js";
+import { addParticleDrawEvent } from "./particles/draw.js";
 
 function setup() {
   let screenWidth = 1000;
   let screenHeight = 1000;
-  let particleSimulation = new BasicParticleSimulation(
-    screenWidth,
-    screenHeight,
-    50,
-    50,
-    0.2
-  );
+
+  let particleSimulation = new CriticalitySimulation(1000, 1000);
 
   createCanvas(screenWidth, screenHeight);
   noLoop();
 
   let registry = particleSimulation.getRegistry();
 
-  registry.addIntervalEvent(
-    17,
-    (state) => {
-      background(128);
-      state.entities.forEach((entity) => {
-        let particle = entity
-          .getValue()
-          .withMove(state.timeMillis - entity.getCreationTimeMillis());
-
-        let c = particle.getColor();
-        noStroke();
-        fill(color(c.red * 255, c.green * 255, c.blue * 255));
-        ellipse(
-          particle.getX(),
-          particle.getY(),
-          particle.getRadius() * 2,
-          particle.getRadius() * 2
-        );
-      });
-    },
-    true
-  );
+  addParticleDrawEvent(registry, 60);
 
   let simulation = new EntitySimulation(
     particleSimulation.getParticles(),

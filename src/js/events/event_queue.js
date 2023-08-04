@@ -57,7 +57,6 @@ export class EventQueue {
       if (nextEvent.isRealTime) {
         let realTimeDelayMillis = eventTime - this.#realTimeMillis;
         this.#realTimeMillis = eventTime;
-        console.log(this.#getTime() - lastRealTime);
         setTimeout(() => {
           nextEvent.executionFn(eventTime);
           this.#run();

@@ -49,8 +49,8 @@ export class BasicParticleSimulation {
 
   getParticlesBasic() {
     return [
-      new Particle(500, 100, 0, 50, 20, color(255, 0, 0), 10),
-      new Particle(500, 900, 0, -50, 20, color(0, 255, 0), 10),
+      new Particle(500, 480, 0, 50, 50, 10, { red: 255, green: 0, blue: 0 }),
+      new Particle(500, 520, 0, -50, 50, 10, { red: 0, green: 0, blue: 255 }),
     ];
   }
 
